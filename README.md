@@ -9,6 +9,6 @@
 - [Logrus](github.com/sirupsen/logrus) - Логгер
 - [Viper](https://github.com/spf13/viper) - Библиотека для работы с конфигурационными файлами
 
-###### Запуск:
+#### Запуск:
 Сервисы `postgres` и `pgadmin` запускаются с помощью `docker-compose`
 Сервер запускается отдельно, например, с помощью `Makefile`
