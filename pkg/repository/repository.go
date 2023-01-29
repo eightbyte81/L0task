@@ -2,6 +2,8 @@ package repository
 
 import (
 	"L0task/pkg/model"
+	"L0task/pkg/repository/cache"
+	"L0task/pkg/repository/postgres"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -34,8 +36,15 @@ type OrderItems interface {
 	GetOrderItemsByOrderId(orderId int) ([]model.OrderItems, error)
 }
 
+type OrderCache interface {
+	SetOrderInCache(orderUid string, order model.Order) error
+	GetCachedOrderByUid(orderUid string) (model.Order, error)
+	GetAllCachedOrders() ([]model.Order, error)
+}
+
 type Repository struct {
 	Order
+	OrderCache
 	Delivery
 	Payment
 	Item
@@ -44,10 +53,11 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		Order:      NewOrderPostgres(db),
-		Delivery:   NewDeliveryPostgres(db),
-		Payment:    NewPaymentPostgres(db),
-		Item:       NewItemPostgres(db),
-		OrderItems: NewOrderItemsPostgres(db),
+		Order:      postgres.NewOrderPostgres(db),
+		OrderCache: cache.NewOrderCache(cache.NewCache()),
+		Delivery:   postgres.NewDeliveryPostgres(db),
+		Payment:    postgres.NewPaymentPostgres(db),
+		Item:       postgres.NewItemPostgres(db),
+		OrderItems: postgres.NewOrderItemsPostgres(db),
 	}
 }

@@ -11,10 +11,11 @@ type OrderService struct {
 	paymentRepo    repository.Payment
 	itemRepo       repository.Item
 	orderItemsRepo repository.OrderItems
+	orderCacheRepo repository.OrderCache
 }
 
-func NewOrderService(repo repository.Order, deliveryRepo repository.Delivery, paymentRepo repository.Payment, itemRepo repository.Item, orderItemsRepo repository.OrderItems) *OrderService {
-	return &OrderService{repo: repo, deliveryRepo: deliveryRepo, paymentRepo: paymentRepo, itemRepo: itemRepo, orderItemsRepo: orderItemsRepo}
+func NewOrderService(repo repository.Order, deliveryRepo repository.Delivery, paymentRepo repository.Payment, itemRepo repository.Item, orderItemsRepo repository.OrderItems, orderCacheRepo repository.OrderCache) *OrderService {
+	return &OrderService{repo: repo, deliveryRepo: deliveryRepo, paymentRepo: paymentRepo, itemRepo: itemRepo, orderItemsRepo: orderItemsRepo, orderCacheRepo: orderCacheRepo}
 }
 
 func (s *OrderService) SetOrder(order model.Order) (int, error) {
@@ -46,6 +47,25 @@ func (s *OrderService) SetOrder(order model.Order) (int, error) {
 	return orderId, nil
 }
 
+func (s *OrderService) SetOrderInCache(order model.Order) error {
+	return s.orderCacheRepo.SetOrderInCache(order.OrderUid, order)
+}
+
+func (s *OrderService) SetOrdersFromDbToCache() error {
+	orders, ordersErr := s.GetAllOrders()
+	if ordersErr != nil {
+		return ordersErr
+	}
+
+	for i := 0; i < len(orders); i++ {
+		if cacheErr := s.SetOrderInCache(orders[i]); cacheErr != nil {
+			return cacheErr
+		}
+	}
+
+	return nil
+}
+
 func (s *OrderService) GetOrderById(orderId int) (model.Order, error) {
 	orderDbDto, orderDbDtoErr := s.repo.GetOrderById(orderId)
 	if orderDbDtoErr != nil {
@@ -55,13 +75,17 @@ func (s *OrderService) GetOrderById(orderId int) (model.Order, error) {
 	return s.BuildOrder(orderDbDto)
 }
 
+func (s *OrderService) GetCachedOrderByUid(orderUid string) (model.Order, error) {
+	return s.orderCacheRepo.GetCachedOrderByUid(orderUid)
+}
+
 func (s *OrderService) GetAllOrders() ([]model.Order, error) {
 	orderDbDtos, orderDbDtosErr := s.repo.GetAllOrders()
 	if orderDbDtosErr != nil {
 		return []model.Order{}, orderDbDtosErr
 	}
 
-	orders := make([]model.Order, len(orderDbDtos))
+	orders := make([]model.Order, len(orderDbDtos), len(orderDbDtos))
 	for i, orderDbDto := range orderDbDtos {
 		if builtOrder, orderBuildingErr := s.BuildOrder(orderDbDto); orderBuildingErr != nil {
 			return []model.Order{}, orderBuildingErr
@@ -71,6 +95,10 @@ func (s *OrderService) GetAllOrders() ([]model.Order, error) {
 	}
 
 	return orders, nil
+}
+
+func (s *OrderService) GetAllCachedOrders() ([]model.Order, error) {
+	return s.orderCacheRepo.GetAllCachedOrders()
 }
 
 func (s *OrderService) BuildOrder(orderDbDto model.OrderDbDto) (model.Order, error) {
@@ -89,7 +117,7 @@ func (s *OrderService) BuildOrder(orderDbDto model.OrderDbDto) (model.Order, err
 		return model.Order{}, orderItemsErr
 	}
 
-	items := make([]model.Item, len(orderItems))
+	items := make([]model.Item, len(orderItems), len(orderItems))
 	for i, orderItem := range orderItems {
 		if item, itemErr := s.itemRepo.GetItemById(orderItem.ChrtId); itemErr != nil {
 			return model.Order{}, itemErr

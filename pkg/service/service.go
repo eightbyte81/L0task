@@ -7,8 +7,12 @@ import (
 
 type Order interface {
 	SetOrder(order model.Order) (int, error)
+	SetOrderInCache(order model.Order) error
+	SetOrdersFromDbToCache() error
 	GetOrderById(orderId int) (model.Order, error)
+	GetCachedOrderByUid(orderUid string) (model.Order, error)
 	GetAllOrders() ([]model.Order, error)
+	GetAllCachedOrders() ([]model.Order, error)
 	BuildOrder(orderDbDto model.OrderDbDto) (model.Order, error)
 }
 
@@ -45,7 +49,7 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Order:      NewOrderService(repos.Order, repos.Delivery, repos.Payment, repos.Item, repos.OrderItems),
+		Order:      NewOrderService(repos.Order, repos.Delivery, repos.Payment, repos.Item, repos.OrderItems, repos.OrderCache),
 		Delivery:   NewDeliveryService(repos.Delivery),
 		Payment:    NewPaymentService(repos.Payment),
 		Item:       NewItemService(repos.Item),

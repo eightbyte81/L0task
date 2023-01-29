@@ -4,6 +4,7 @@ import (
 	"L0task"
 	"L0task/pkg/handler"
 	"L0task/pkg/repository"
+	"L0task/pkg/repository/postgres"
 	"L0task/pkg/service"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -26,7 +27,7 @@ func main() {
 	}
 
 	logrus.Print("Initializing database...")
-	db, err := repository.NewPostgresDB(repository.Config{
+	db, err := postgres.NewPostgresDB(postgres.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),

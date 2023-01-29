@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"L0task/pkg/model"
@@ -44,7 +44,7 @@ func (r *OrderPostgres) GetOrderById(orderId int) (model.OrderDbDto, error) {
 func (r *OrderPostgres) GetAllOrders() ([]model.OrderDbDto, error) {
 	var orderDbDtos []model.OrderDbDto
 	query := fmt.Sprintf("SELECT * FROM \"%s\"", ordersTable)
-	err := r.db.Get(&orderDbDtos, query)
+	err := r.db.Select(&orderDbDtos, query)
 
 	return orderDbDtos, err
 }

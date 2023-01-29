@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"L0task/pkg/model"
@@ -36,7 +36,7 @@ func (r *ItemPostgres) GetItemById(itemId int) (model.Item, error) {
 func (r *ItemPostgres) GetAllItems() ([]model.Item, error) {
 	var items []model.Item
 	query := fmt.Sprintf("SELECT * FROM %s", itemsTable)
-	err := r.db.Get(&items, query)
+	err := r.db.Select(&items, query)
 
 	return items, err
 }

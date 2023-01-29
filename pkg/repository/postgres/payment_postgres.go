@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"L0task/pkg/model"
@@ -36,7 +36,7 @@ func (r *PaymentPostgres) GetPaymentById(paymentId int) (model.Payment, error) {
 func (r *PaymentPostgres) GetAllPayments() ([]model.Payment, error) {
 	var payments []model.Payment
 	query := fmt.Sprintf("SELECT * FROM %s", paymentsTable)
-	err := r.db.Get(&payments, query)
+	err := r.db.Select(&payments, query)
 
 	return payments, err
 }
