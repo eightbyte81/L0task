@@ -1,5 +1,4 @@
 CREATE TABLE "order" (
-                         "order_id" serial NOT NULL,
                          "order_uid" TEXT NOT NULL,
                          "track_number" TEXT NOT NULL,
                          "entry" TEXT NOT NULL,
@@ -13,7 +12,7 @@ CREATE TABLE "order" (
                          "sm_id" integer NOT NULL,
                          "date_created" TIMESTAMP NOT NULL,
                          "oof_shard" TEXT NOT NULL,
-                         CONSTRAINT "order_pk" PRIMARY KEY ("order_id")
+                         CONSTRAINT "order_pk" PRIMARY KEY ("order_uid")
 ) WITH (
       OIDS=FALSE
       );
@@ -57,7 +56,7 @@ CREATE TABLE "payment" (
 
 CREATE TABLE "order_item" (
                               "order_items_id" serial NOT NULL,
-                              "order_id" serial NOT NULL,
+                              "order_uid" TEXT NOT NULL,
                               "chrt_id" integer NOT NULL,
                               CONSTRAINT "order_item_pk" PRIMARY KEY ("order_items_id")
 ) WITH (
@@ -90,7 +89,7 @@ ALTER TABLE "order" ADD CONSTRAINT "order_fk1" FOREIGN KEY ("payment_id") REFERE
 
 
 
-ALTER TABLE "order_item" ADD CONSTRAINT "order_item_fk0" FOREIGN KEY ("order_id") REFERENCES "order"("order_id");
+ALTER TABLE "order_item" ADD CONSTRAINT "order_item_fk0" FOREIGN KEY ("order_uid") REFERENCES "order"("order_uid");
 ALTER TABLE "order_item" ADD CONSTRAINT "order_item_fk1" FOREIGN KEY ("chrt_id") REFERENCES "item"("chrt_id");
 
 

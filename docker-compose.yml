@@ -30,6 +30,21 @@ services:
       - l0task-app
     restart: unless-stopped
 
+  nats-streaming:
+    command:
+      - "--cluster_id"
+      - app-cluster
+    image: library/nats-streaming:latest
+    restart: always
+    container_name: nats-streaming
+    ports:
+      - 4222:4222
+      - 8222:8222
+    volumes:
+      - nats-streaming:/var/lib/nats-streaming
+    networks:
+      - l0task-app
+
 networks:
   l0task-app:
     driver: bridge
@@ -37,3 +52,4 @@ networks:
 volumes:
   postgres:
   pgadmin:
+  nats-streaming:

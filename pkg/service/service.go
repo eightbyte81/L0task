@@ -6,10 +6,10 @@ import (
 )
 
 type Order interface {
-	SetOrder(order model.Order) (int, error)
+	SetOrder(order model.Order) (string, error)
 	SetOrderInCache(order model.Order) error
 	SetOrdersFromDbToCache() error
-	GetOrderById(orderId int) (model.Order, error)
+	GetOrderByUid(orderUid string) (model.Order, error)
 	GetCachedOrderByUid(orderUid string) (model.Order, error)
 	GetAllOrders() ([]model.Order, error)
 	GetAllCachedOrders() ([]model.Order, error)
@@ -35,8 +35,8 @@ type Item interface {
 }
 
 type OrderItems interface {
-	SetOrderItems(orderId int, items []model.Item) (int, error)
-	GetOrderItemsByOrderId(orderId int) ([]model.OrderItems, error)
+	SetOrderItems(orderUid string, items []model.Item) (int, error)
+	GetOrderItemsByOrderUid(orderUid string) ([]model.OrderItems, error)
 }
 
 type Service struct {

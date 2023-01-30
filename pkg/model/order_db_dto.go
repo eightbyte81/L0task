@@ -1,7 +1,6 @@
 package model
 
 type OrderDbDto struct {
-	OrderId           int    `db:"order_id"`
 	OrderUid          string `db:"order_uid"`
 	TrackNumber       string `db:"track_number"`
 	Entry             string `db:"entry"`

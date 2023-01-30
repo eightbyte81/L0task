@@ -6,3 +6,15 @@ db:
   username: "me"
   dbname: "wildberries_db"
   ssl_mode: "disable"
+
+nats:
+  port: "4222"
+  url_sub: "nats://localhost:4222"
+  url_pub: "nats://localhost:4222"
+  cluster_id: "app-cluster"
+  client_producer: "producer"
+  client_subscriber: "subscriber"
+  subject: "orders"
+
+json:
+  static_model_path: "pkg/static/model.json"

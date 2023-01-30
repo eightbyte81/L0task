@@ -18,33 +18,33 @@ func NewOrderService(repo repository.Order, deliveryRepo repository.Delivery, pa
 	return &OrderService{repo: repo, deliveryRepo: deliveryRepo, paymentRepo: paymentRepo, itemRepo: itemRepo, orderItemsRepo: orderItemsRepo, orderCacheRepo: orderCacheRepo}
 }
 
-func (s *OrderService) SetOrder(order model.Order) (int, error) {
+func (s *OrderService) SetOrder(order model.Order) (string, error) {
 	deliveryId, deliveryErr := s.deliveryRepo.SetDelivery(order.Delivery)
 	if deliveryErr != nil {
-		return deliveryId, deliveryErr
+		return string(rune(deliveryId)), deliveryErr
 	}
 
 	paymentId, paymentErr := s.paymentRepo.SetPayment(order.Payment)
 	if paymentErr != nil {
-		return paymentId, paymentErr
+		return string(rune(paymentId)), paymentErr
 	}
 
 	for _, item := range order.Items {
 		if itemId, err := s.itemRepo.SetItem(item); err != nil {
-			return itemId, err
+			return string(rune(itemId)), err
 		}
 	}
 
-	orderId, orderErr := s.repo.SetOrder(order, deliveryId, paymentId)
+	orderUid, orderErr := s.repo.SetOrder(order, deliveryId, paymentId)
 	if orderErr != nil {
-		return orderId, orderErr
+		return orderUid, orderErr
 	}
 
-	if orderItemsId, orderItemsErr := s.orderItemsRepo.SetOrderItems(orderId, order.Items); orderItemsErr != nil {
-		return orderItemsId, orderItemsErr
+	if orderItemsId, orderItemsErr := s.orderItemsRepo.SetOrderItems(orderUid, order.Items); orderItemsErr != nil {
+		return string(rune(orderItemsId)), orderItemsErr
 	}
 
-	return orderId, nil
+	return orderUid, nil
 }
 
 func (s *OrderService) SetOrderInCache(order model.Order) error {
@@ -66,8 +66,8 @@ func (s *OrderService) SetOrdersFromDbToCache() error {
 	return nil
 }
 
-func (s *OrderService) GetOrderById(orderId int) (model.Order, error) {
-	orderDbDto, orderDbDtoErr := s.repo.GetOrderById(orderId)
+func (s *OrderService) GetOrderByUid(orderUid string) (model.Order, error) {
+	orderDbDto, orderDbDtoErr := s.repo.GetOrderByUid(orderUid)
 	if orderDbDtoErr != nil {
 		return model.Order{}, orderDbDtoErr
 	}
@@ -112,7 +112,7 @@ func (s *OrderService) BuildOrder(orderDbDto model.OrderDbDto) (model.Order, err
 		return model.Order{}, paymentErr
 	}
 
-	orderItems, orderItemsErr := s.orderItemsRepo.GetOrderItemsByOrderId(orderDbDto.OrderId)
+	orderItems, orderItemsErr := s.orderItemsRepo.GetOrderItemsByOrderUid(orderDbDto.OrderUid)
 	if orderItemsErr != nil {
 		return model.Order{}, orderItemsErr
 	}

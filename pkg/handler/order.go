@@ -4,7 +4,6 @@ import (
 	"L0task/pkg/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 )
 
 func (h *Handler) setOrder(c *gin.Context) {
@@ -15,7 +14,7 @@ func (h *Handler) setOrder(c *gin.Context) {
 		return
 	}
 
-	id, orderErr := h.services.Order.SetOrder(req)
+	uid, orderErr := h.services.Order.SetOrder(req)
 	if orderErr != nil {
 		c.String(http.StatusInternalServerError, orderErr.Error())
 		return
@@ -26,7 +25,7 @@ func (h *Handler) setOrder(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, "Order created with id %d", id)
+	c.String(http.StatusOK, "Order created with uid %s", uid)
 }
 
 func (h *Handler) getAllOrders(c *gin.Context) {
@@ -49,16 +48,10 @@ func (h *Handler) getAllCachedOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
-func (h *Handler) getOrderById(c *gin.Context) {
-	orderIdParam := c.Param("id")
+func (h *Handler) getOrderByUid(c *gin.Context) {
+	orderUidParam := c.Param("uid")
 
-	orderId, conversionErr := strconv.Atoi(orderIdParam)
-	if conversionErr != nil {
-		c.String(http.StatusBadRequest, "Error getting orderId value: %s", orderIdParam)
-		return
-	}
-
-	order, orderErr := h.services.GetOrderById(orderId)
+	order, orderErr := h.services.GetOrderByUid(orderUidParam)
 	if orderErr != nil {
 		c.String(http.StatusInternalServerError, orderErr.Error())
 		return

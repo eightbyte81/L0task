@@ -8,8 +8,8 @@ import (
 )
 
 type Order interface {
-	SetOrder(order model.Order, deliveryId int, paymentId int) (int, error)
-	GetOrderById(orderId int) (model.OrderDbDto, error)
+	SetOrder(order model.Order, deliveryId int, paymentId int) (string, error)
+	GetOrderByUid(orderUid string) (model.OrderDbDto, error)
 	GetAllOrders() ([]model.OrderDbDto, error)
 }
 
@@ -32,8 +32,8 @@ type Item interface {
 }
 
 type OrderItems interface {
-	SetOrderItems(orderId int, items []model.Item) (int, error)
-	GetOrderItemsByOrderId(orderId int) ([]model.OrderItems, error)
+	SetOrderItems(orderUid string, items []model.Item) (int, error)
+	GetOrderItemsByOrderUid(orderUid string) ([]model.OrderItems, error)
 }
 
 type OrderCache interface {

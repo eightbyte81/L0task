@@ -21,7 +21,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		order.POST("/", h.setOrder)
 		order.GET("/", h.getAllOrders)
 		order.GET("/cache/", h.getAllCachedOrders)
-		order.GET("/:id", h.getOrderById)
+		order.GET("/:uid", h.getOrderByUid)
 		order.GET("/cache/:uid", h.getCachedOrderByUid)
 		order.PUT("/", h.updateOrder)
 		order.DELETE("/", h.deleteOrder)

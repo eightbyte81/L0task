@@ -13,10 +13,10 @@ func NewOrderItemsService(repo repository.OrderItems) *OrderItemsService {
 	return &OrderItemsService{repo: repo}
 }
 
-func (s *OrderItemsService) SetOrderItems(orderId int, items []model.Item) (int, error) {
-	return s.repo.SetOrderItems(orderId, items)
+func (s *OrderItemsService) SetOrderItems(orderUid string, items []model.Item) (int, error) {
+	return s.repo.SetOrderItems(orderUid, items)
 }
 
-func (s *OrderItemsService) GetOrderItemsByOrderId(orderId int) ([]model.OrderItems, error) {
-	return s.repo.GetOrderItemsByOrderId(orderId)
+func (s *OrderItemsService) GetOrderItemsByOrderUid(orderUid string) ([]model.OrderItems, error) {
+	return s.repo.GetOrderItemsByOrderUid(orderUid)
 }
