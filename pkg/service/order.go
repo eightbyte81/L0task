@@ -3,6 +3,7 @@ package service
 import (
 	"L0task/pkg/model"
 	"L0task/pkg/repository"
+	"fmt"
 )
 
 type OrderService struct {
@@ -19,6 +20,10 @@ func NewOrderService(repo repository.Order, deliveryRepo repository.Delivery, pa
 }
 
 func (s *OrderService) SetOrder(order model.Order) (string, error) {
+	if _, dbOrderErr := s.GetOrderByUid(order.OrderUid); dbOrderErr == nil {
+		return "", fmt.Errorf("failed to create order: order with uid %s is already exist", order.OrderUid)
+	}
+
 	deliveryId, deliveryErr := s.deliveryRepo.SetDelivery(order.Delivery)
 	if deliveryErr != nil {
 		return string(rune(deliveryId)), deliveryErr

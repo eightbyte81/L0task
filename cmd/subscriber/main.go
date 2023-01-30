@@ -20,19 +20,19 @@ import (
 )
 
 func main() {
-	logrus.Print("Server initialization starting...")
+	logrus.Print("[MAIN] Server initialization starting...")
 
-	logrus.Print("Initializing configs...")
+	logrus.Print("[MAIN] Initializing configs...")
 	if configErr := initConfig(); configErr != nil {
-		logrus.Fatalf("Error initializing configs: %s", configErr.Error())
+		logrus.Fatalf("[MAIN] Error initializing configs: %s", configErr.Error())
 	}
 
 	logrus.Print("Loading env variables...")
 	if envErr := godotenv.Load(); envErr != nil {
-		logrus.Fatalf("Error loading env variables: %s", envErr.Error())
+		logrus.Fatalf("[MAIN] Error loading env variables: %s", envErr.Error())
 	}
 
-	logrus.Print("Initializing database...")
+	logrus.Print("[MAIN] Initializing database...")
 	db, dbErr := postgres.NewPostgresDB(postgres.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
@@ -42,19 +42,19 @@ func main() {
 		Password: os.Getenv("DB_PASSWORD"),
 	})
 	if dbErr != nil {
-		logrus.Fatalf("Failed to initialize db: %s", dbErr.Error())
+		logrus.Fatalf("[MAIN] Failed to initialize db: %s", dbErr.Error())
 	}
 
-	logrus.Print("Initializing services...")
+	logrus.Print("[MAIN] Initializing services...")
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 
-	logrus.Print("Restoring data from database to cache...")
+	logrus.Print("[MAIN] Restoring data from database to cache...")
 	if dbToCacheErr := services.SetOrdersFromDbToCache(); dbToCacheErr != nil {
-		logrus.Fatalf("Failed to restore data from database to cache: %s", dbErr.Error())
+		logrus.Fatalf("[MAIN] Failed to restore data from database to cache: %s", dbErr.Error())
 	}
 
-	logrus.Print("Initializing nats-streaming server...")
+	logrus.Print("[MAIN] Initializing nats-streaming server...")
 	natsStreaming := handler.NewNats(services, validator.New())
 
 	stanConn, stanConnErr := natsStreaming.Connect(
@@ -66,11 +66,11 @@ func main() {
 	}
 	defer func(sc stan.Conn) {
 		if scErr := sc.Close(); scErr != nil {
-			logrus.Errorf("Failed to close subscriber connection to nats streaming server: %s", scErr.Error())
+			logrus.Errorf("[MAIN] Failed to close subscriber connection to nats streaming server: %s", scErr.Error())
 		}
 	}(stanConn)
 
-	logrus.Print("Subscribing to nats subject \"orders\"...")
+	logrus.Print("[MAIN] Subscribing to nats subject \"orders\"...")
 	var waitGroup sync.WaitGroup
 	waitGroup.Add(1)
 	go func() {
@@ -78,34 +78,34 @@ func main() {
 			return
 		}
 	}()
-	logrus.Print("Subscription to nats-streaming subject succeed")
+	logrus.Print("[MAIN] Subscription to nats-streaming subject succeed")
 
 	handlers := handler.NewHandler(services)
 
-	logrus.Print("Starting server...")
+	logrus.Print("[MAIN] Starting server...")
 	srv := new(L0task.Server)
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("Failed to run http server: %s", err.Error())
+		logrus.Fatalf("[MAIN] Failed to run http server: %s", err.Error())
 	}
 
-	logrus.Print("Server started")
+	logrus.Print("[MAIN] Server started")
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
 
-	logrus.Print("Server shutting down...")
+	logrus.Print("[MAIN] Server shutting down...")
 
 	if srvCloseErr := srv.Shutdown(context.Background()); srvCloseErr != nil {
-		logrus.Errorf("Failed to shutdown server: %s", srvCloseErr.Error())
+		logrus.Errorf("[MAIN] Failed to shutdown server: %s", srvCloseErr.Error())
 	}
 
 	if dbCloseErr := db.Close(); dbCloseErr != nil {
-		logrus.Errorf("Failed to close database connection: %s", dbCloseErr.Error())
+		logrus.Errorf("[MAIN] Failed to close database connection: %s", dbCloseErr.Error())
 	}
 
 	if scErr := stanConn.Close(); scErr != nil {
-		logrus.Errorf("Failed to close nats-streaming connection: %s", scErr.Error())
+		logrus.Errorf("[MAIN] Failed to close nats-streaming connection: %s", scErr.Error())
 	}
 }
 
