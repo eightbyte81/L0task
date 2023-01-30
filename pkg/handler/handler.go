@@ -1,8 +1,11 @@
 package handler
 
 import (
+	_ "L0task/docs"
 	"L0task/pkg/service"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -23,9 +26,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		order.GET("/cache/", h.getAllCachedOrders)
 		order.GET("/:uid", h.getOrderByUid)
 		order.GET("/cache/:uid", h.getCachedOrderByUid)
-		order.PUT("/", h.updateOrder)
-		order.DELETE("/", h.deleteOrder)
 	}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

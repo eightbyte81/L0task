@@ -19,6 +19,12 @@ import (
 	"syscall"
 )
 
+// @title L0Task
+// @version 1.0
+// @description Test task 0 (Wildberries internship)
+
+// @host localhost:8000
+// @basePath /
 func main() {
 	logrus.Print("[MAIN] Server initialization starting...")
 
@@ -70,7 +76,7 @@ func main() {
 		}
 	}(stanConn)
 
-	logrus.Print("[MAIN] Subscribing to nats subject \"orders\"...")
+	logrus.Print("[MAIN] Subscribing to nats subject 'orders'...")
 	var waitGroup sync.WaitGroup
 	waitGroup.Add(1)
 	go func() {
