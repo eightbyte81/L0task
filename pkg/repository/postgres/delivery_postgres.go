@@ -41,3 +41,10 @@ func (r *DeliveryPostgres) GetAllDeliveries() ([]model.Delivery, error) {
 
 	return deliveries, err
 }
+
+func (r *DeliveryPostgres) DeleteDelivery(deliveryId int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE delivery_id=$1", deliveriesTable)
+	_, err := r.db.Exec(query, deliveryId)
+
+	return err
+}

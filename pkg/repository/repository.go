@@ -11,29 +11,34 @@ type Order interface {
 	SetOrder(order model.Order, deliveryId int, paymentId int) (string, error)
 	GetOrderByUid(orderUid string) (model.OrderDbDto, error)
 	GetAllOrders() ([]model.OrderDbDto, error)
+	DeleteOrder(uid string) error
 }
 
 type Delivery interface {
 	SetDelivery(delivery model.Delivery) (int, error)
 	GetDeliveryById(deliveryId int) (model.Delivery, error)
 	GetAllDeliveries() ([]model.Delivery, error)
+	DeleteDelivery(deliveryId int) error
 }
 
 type Payment interface {
 	SetPayment(payment model.Payment) (int, error)
 	GetPaymentById(paymentId int) (model.Payment, error)
 	GetAllPayments() ([]model.Payment, error)
+	DeletePayment(paymentId int) error
 }
 
 type Item interface {
 	SetItem(item model.Item) (int, error)
 	GetItemById(itemId int) (model.Item, error)
 	GetAllItems() ([]model.Item, error)
+	DeleteItem(itemId int) error
 }
 
 type OrderItems interface {
 	SetOrderItems(orderUid string, items []model.Item) (int, error)
 	GetOrderItemsByOrderUid(orderUid string) ([]model.OrderItems, error)
+	DeleteOrderItems(orderUid string) error
 }
 
 type OrderCache interface {

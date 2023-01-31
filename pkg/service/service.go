@@ -15,30 +15,36 @@ type Order interface {
 	GetCachedOrderByUid(orderUid string) (model.Order, error)
 	GetAllOrders() ([]model.Order, error)
 	GetAllCachedOrders() ([]model.Order, error)
+	DeleteOrder(orderUid string) error
 	BuildOrder(orderDbDto model.OrderDbDto) (model.Order, error)
+	RollbackOrderTransaction(deliveryId int, paymentId int, order model.Order) error
 }
 
 type Delivery interface {
 	SetDelivery(delivery model.Delivery) (int, error)
 	GetDeliveryById(deliveryId int) (model.Delivery, error)
 	GetAllDeliveries() ([]model.Delivery, error)
+	DeleteDelivery(deliveryId int) error
 }
 
 type Payment interface {
 	SetPayment(payment model.Payment) (int, error)
 	GetPaymentById(paymentId int) (model.Payment, error)
 	GetAllPayments() ([]model.Payment, error)
+	DeletePayment(paymentId int) error
 }
 
 type Item interface {
 	SetItem(item model.Item) (int, error)
 	GetItemById(itemId int) (model.Item, error)
 	GetAllItems() ([]model.Item, error)
+	DeleteItem(itemId int) error
 }
 
 type OrderItems interface {
 	SetOrderItems(orderUid string, items []model.Item) (int, error)
 	GetOrderItemsByOrderUid(orderUid string) ([]model.OrderItems, error)
+	DeleteOrderItems(orderUid string) error
 }
 
 type IService interface {

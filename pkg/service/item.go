@@ -23,3 +23,7 @@ func (s *ItemService) GetItemById(itemId int) (model.Item, error) {
 func (s *ItemService) GetAllItems() ([]model.Item, error) {
 	return s.repo.GetAllItems()
 }
+
+func (s *ItemService) DeleteItem(itemId int) error {
+	return s.repo.DeleteItem(itemId)
+}

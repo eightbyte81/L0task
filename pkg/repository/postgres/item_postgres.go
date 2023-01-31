@@ -40,3 +40,10 @@ func (r *ItemPostgres) GetAllItems() ([]model.Item, error) {
 
 	return items, err
 }
+
+func (r *ItemPostgres) DeleteItem(itemId int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE chrt_id=$1", itemsTable)
+	_, err := r.db.Exec(query, itemId)
+
+	return err
+}

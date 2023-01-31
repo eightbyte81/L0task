@@ -26,26 +26,50 @@ func (s *OrderService) SetOrder(order model.Order) (string, error) {
 
 	deliveryId, deliveryErr := s.deliveryRepo.SetDelivery(order.Delivery)
 	if deliveryErr != nil {
+		err := s.RollbackOrderTransaction(deliveryId, 0, model.Order{})
+		if err != nil {
+			return "", err
+		}
+
 		return string(rune(deliveryId)), deliveryErr
 	}
 
 	paymentId, paymentErr := s.paymentRepo.SetPayment(order.Payment)
 	if paymentErr != nil {
+		err := s.RollbackOrderTransaction(deliveryId, paymentId, model.Order{})
+		if err != nil {
+			return "", err
+		}
+
 		return string(rune(paymentId)), paymentErr
 	}
 
 	for _, item := range order.Items {
 		if itemId, err := s.itemRepo.SetItem(item); err != nil {
+			rollErr := s.RollbackOrderTransaction(deliveryId, paymentId, order)
+			if rollErr != nil {
+				return "", rollErr
+			}
 			return string(rune(itemId)), err
 		}
 	}
 
 	orderUid, orderErr := s.repo.SetOrder(order, deliveryId, paymentId)
 	if orderErr != nil {
+		err := s.RollbackOrderTransaction(deliveryId, paymentId, order)
+		if err != nil {
+			return "", err
+		}
+
 		return orderUid, orderErr
 	}
 
 	if orderItemsId, orderItemsErr := s.orderItemsRepo.SetOrderItems(orderUid, order.Items); orderItemsErr != nil {
+		err := s.RollbackOrderTransaction(deliveryId, paymentId, order)
+		if err != nil {
+			return "", err
+		}
+
 		return string(rune(orderItemsId)), orderItemsErr
 	}
 
@@ -106,6 +130,10 @@ func (s *OrderService) GetAllCachedOrders() ([]model.Order, error) {
 	return s.orderCacheRepo.GetAllCachedOrders()
 }
 
+func (s *OrderService) DeleteOrder(orderUid string) error {
+	return s.repo.DeleteOrder(orderUid)
+}
+
 func (s *OrderService) BuildOrder(orderDbDto model.OrderDbDto) (model.Order, error) {
 	delivery, deliveryErr := s.deliveryRepo.GetDeliveryById(orderDbDto.DeliveryId)
 	if deliveryErr != nil {
@@ -147,4 +175,45 @@ func (s *OrderService) BuildOrder(orderDbDto model.OrderDbDto) (model.Order, err
 		DateCreated:       orderDbDto.DateCreated,
 		OofShard:          orderDbDto.OofShard,
 	}, nil
+}
+
+func (s *OrderService) RollbackOrderTransaction(deliveryId int, paymentId int, order model.Order) error {
+	if _, deliveryErr := s.deliveryRepo.GetDeliveryById(deliveryId); deliveryErr == nil {
+		deliveryErr = s.deliveryRepo.DeleteDelivery(deliveryId)
+		if deliveryErr != nil {
+			return deliveryErr
+		}
+	}
+
+	if _, paymentErr := s.paymentRepo.GetPaymentById(paymentId); paymentErr == nil {
+		paymentErr = s.paymentRepo.DeletePayment(paymentId)
+		if paymentErr != nil {
+			return paymentErr
+		}
+	}
+
+	for _, item := range order.Items {
+		if _, itemErr := s.itemRepo.GetItemById(item.ChrtId); itemErr == nil {
+			itemErr = s.itemRepo.DeleteItem(item.ChrtId)
+			if itemErr != nil {
+				return itemErr
+			}
+		}
+	}
+
+	if _, orderErr := s.GetOrderByUid(order.OrderUid); orderErr == nil {
+		orderErr = s.DeleteOrder(order.OrderUid)
+		if orderErr != nil {
+			return orderErr
+		}
+	}
+
+	if _, orderItemsErr := s.orderItemsRepo.GetOrderItemsByOrderUid(order.OrderUid); orderItemsErr == nil {
+		orderItemsErr = s.orderItemsRepo.DeleteOrderItems(order.OrderUid)
+		if orderItemsErr != nil {
+			return orderItemsErr
+		}
+	}
+
+	return nil
 }

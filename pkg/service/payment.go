@@ -23,3 +23,7 @@ func (s *PaymentService) GetPaymentById(paymentId int) (model.Payment, error) {
 func (s *PaymentService) GetAllPayments() ([]model.Payment, error) {
 	return s.repo.GetAllPayments()
 }
+
+func (s *PaymentService) DeletePayment(paymentId int) error {
+	return s.repo.DeletePayment(paymentId)
+}

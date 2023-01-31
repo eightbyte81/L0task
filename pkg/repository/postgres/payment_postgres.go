@@ -40,3 +40,11 @@ func (r *PaymentPostgres) GetAllPayments() ([]model.Payment, error) {
 
 	return payments, err
 }
+
+func (r *PaymentPostgres) DeletePayment(paymentId int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE payment_id=$1", paymentsTable)
+	_, err := r.db.Exec(query, paymentId)
+
+	return err
+	return nil
+}

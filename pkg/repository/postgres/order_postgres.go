@@ -48,3 +48,10 @@ func (r *OrderPostgres) GetAllOrders() ([]model.OrderDbDto, error) {
 
 	return orderDbDtos, err
 }
+
+func (r *OrderPostgres) DeleteOrder(orderUid string) error {
+	query := fmt.Sprintf("DELETE FROM \"%s\" WHERE order_uid=$1", ordersTable)
+	_, err := r.db.Exec(query, orderUid)
+
+	return err
+}

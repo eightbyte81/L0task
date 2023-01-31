@@ -20,3 +20,7 @@ func (s *OrderItemsService) SetOrderItems(orderUid string, items []model.Item) (
 func (s *OrderItemsService) GetOrderItemsByOrderUid(orderUid string) ([]model.OrderItems, error) {
 	return s.repo.GetOrderItemsByOrderUid(orderUid)
 }
+
+func (s *OrderItemsService) DeleteOrderItems(orderUid string) error {
+	return s.repo.DeleteOrderItems(orderUid)
+}

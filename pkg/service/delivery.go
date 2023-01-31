@@ -24,3 +24,7 @@ func (s *DeliveryService) GetDeliveryById(deliveryId int) (model.Delivery, error
 func (s *DeliveryService) GetAllDeliveries() ([]model.Delivery, error) {
 	return s.repo.GetAllDeliveries()
 }
+
+func (s *DeliveryService) DeleteDelivery(deliveryId int) error {
+	return s.repo.DeleteDelivery(deliveryId)
+}
