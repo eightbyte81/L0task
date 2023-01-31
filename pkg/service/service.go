@@ -5,6 +5,8 @@ import (
 	"L0task/pkg/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=../test/mocks/mock.go
+
 type Order interface {
 	SetOrder(order model.Order) (string, error)
 	SetOrderInCache(order model.Order) error
@@ -37,6 +39,14 @@ type Item interface {
 type OrderItems interface {
 	SetOrderItems(orderUid string, items []model.Item) (int, error)
 	GetOrderItemsByOrderUid(orderUid string) ([]model.OrderItems, error)
+}
+
+type IService interface {
+	Order
+	Delivery
+	Payment
+	Item
+	OrderItems
 }
 
 type Service struct {

@@ -9,10 +9,10 @@ import (
 )
 
 type Handler struct {
-	services *service.Service
+	services service.IService
 }
 
-func NewHandler(services *service.Service) *Handler {
+func NewHandler(services service.IService) *Handler {
 	return &Handler{services: services}
 }
 
@@ -21,11 +21,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	order := router.Group("/")
 	{
-		order.POST("/", h.setOrder)
-		order.GET("/", h.getAllOrders)
-		order.GET("/cache/", h.getAllCachedOrders)
-		order.GET("/:uid", h.getOrderByUid)
-		order.GET("/cache/:uid", h.getCachedOrderByUid)
+		order.POST("/", h.SetOrder)
+		order.GET("/", h.GetAllOrders)
+		order.GET("/cache/", h.GetAllCachedOrders)
+		order.GET("/:uid", h.GetOrderByUid)
+		order.GET("/cache/:uid", h.GetCachedOrderByUid)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -39,7 +39,6 @@ services:
     container_name: nats-streaming
     ports:
       - 4222:4222
-      - 8222:8222
     volumes:
       - nats-streaming:/var/lib/nats-streaming
     networks:

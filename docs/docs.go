@@ -24,7 +24,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "getAllOrders",
+                "summary": "GetAllOrders",
                 "operationId": "get-all-orders",
                 "responses": {
                     "200": {
@@ -67,7 +67,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "setOrder",
+                "summary": "SetOrder",
                 "operationId": "set-order",
                 "parameters": [
                     {
@@ -117,7 +117,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "getAllCachedOrders",
+                "summary": "GetAllCachedOrders",
                 "operationId": "get-all-cached-orders",
                 "responses": {
                     "200": {
@@ -162,7 +162,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "getCachedOrderByUid",
+                "summary": "GetCachedOrderByUid",
                 "operationId": "get-cached-order-by-uid",
                 "parameters": [
                     {
@@ -216,7 +216,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "getOrderByUid",
+                "summary": "GetOrderByUid",
                 "operationId": "get-order-by-uid",
                 "parameters": [
                     {
